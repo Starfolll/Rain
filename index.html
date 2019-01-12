@@ -7,13 +7,18 @@
       var Canvas;
       var cx
 
+      // THIS VARS CAN BE CHANGED //
+      var is_twoDirections = false;
+      var is_sinMove = false;
+      //////////////////////////////
+      
       window.onload = function(){
         Setup();
         setInterval(Draw,30);
       }
 
       var drops = [];
-      var dropsCount = 300;
+      var dropsCount = 1000;
       function Setup(){
         Canvas = document.getElementById("canvas");
         cx = Canvas.getContext("2d");
@@ -25,7 +30,7 @@
         cx.fillRect(0,0,Canvas.width,Canvas.height);
 
         for(var i = 0; i < dropsCount; i++){
-          drops[i] = new Drop();
+          drops[i] = new Drop(is_twoDirections? Math.random()*2 : 0);
         }
       }
 
@@ -41,10 +46,12 @@
         }
       }
 
-      function Drop(){
+      function Drop(direction){
         this.x = Math.random() * Canvas.width;
-        this.y = Math.random() * Canvas.height;
+        this.y = direction<1? -500 : Canvas.height+500;
         this.size = Math.random() * 5 + 1;
+
+        this.direction = direction;
 
         this.color = Math.random()*2>1 ? (Math.random()*2>1? "#C5E2F7":"#92BAD2") : (Math.random()*2>1? "#53789E":"395877");
 
@@ -59,12 +66,24 @@
         }
 
         this.physics = function(){
-          this.y += this.size*2;
-          //this.x += Math.sin(this.y/100 + Math.random()*Math.PI);
-          if (this.y > Canvas.height){
-            this.color = Math.random()*2>1 ? (Math.random()*2>1? "#C5E2F7":"#92BAD2") : (Math.random()*2>1? "#53789E":"395877");
-            this.y = -Math.random() * 15 + 5;
-            this.x = Math.random() * Canvas.width;
+          if (this.direction<1){
+            this.y += this.size*2;
+            if (is_sinMove){
+              this.x += Math.sin(this.y/30);
+            }
+            if (this.y > Canvas.height){
+              this.color = Math.random()*2>1 ? (Math.random()*2>1? "#C5E2F7":"#92BAD2") : (Math.random()*2>1? "#53789E":"395877");
+              this.y = -Math.random() * 15 - 5;
+              this.x = Math.random() * Canvas.width;
+            }
+          }else{
+            this.y -= this.size*2;
+            this.x -= Math.sin(this.y/30);
+            if (this.y < 0){
+              this.color = Math.random()*2>1 ? (Math.random()*2>1? "#C5E2F7":"#92BAD2") : (Math.random()*2>1? "#53789E":"395877");
+              this.y = Canvas.width + Math.random() * 15 + 5;
+              this.x = Math.random() * Canvas.width;
+            }
           }
         }
       }
